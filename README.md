@@ -36,6 +36,24 @@ Assume you use conda and name your enviroment name as LLM-DEMO.
 #conda activate LLM-DEMO
 #pip install -r requirements.txt
 ```
+## Prepare HANA Cloud Data
+Create an HANA Cloud instance in trial environment.
+Download the sample data from link [https://github.com/SAP-samples/datasphere-content/tree/main/SAP_Sample_Content/CSV](https://github.com/SAP-samples/datasphere-content/tree/main/SAP_Sample_Content/CSV).
+Import to the HANA dadtabase.
+
+## Adjust the schema file
+Adjust the schema files under folder schema to adapt your database.
+
+## Adjust the HANA Cloud Configuration in config.py
+Adjust the HANA Cloud instance linke, user and password in config.py.
+```
+HC = {
+    "endpoint" : "<Your HANA Cloud Instance Link>",
+    "port" : 443,
+    "user" : "<Your DB user>",
+    "password" : "<Your DB password>"
+}
+```
 
 # Run the demo
 Run command:
