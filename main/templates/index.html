@@ -1,0 +1,145 @@
+{% extends '_default_layout.html' %}
+{% block content %}
+<div class="m-4 bg-white rounded-3" style="height: calc(100vh - 100px);">
+  <div class="row" style="height: 10%;">
+    <div class="h-100 d-flex justify-content-between">
+      <h4 class="ps-4 pt-3 v-100 fst-italic">CONVERSATION</h4>
+      <ul class="nav pe-4 pt-3">
+        <li class="nav-item" id="clear-content">
+          <a class="nav-link" href="javascript: $('#chat-container').empty();">
+            <i class="fa fa-brush fa-lg text-secondary"></i>
+          </a>
+        </li>
+        <li class="nav-item d-none" id="indicator">
+          <i class="fas fa-spinner fa-spin fa-2x text-success"></i>
+        </li>
+      </ul>       
+      <!--<div class=" invisible" id="indicator"><i class="fas fa-spinner fa-spin fa-2x text-success"></i> </div>-->    
+    </div>
+  </div>
+  <div class="row h-75 justify-content-center">
+    <div id="chat-container">
+    </div>
+  </div>
+  <div class="row mt-2 justify-content-center" style="height: 65px;">
+    <div class="w-75 h-100 rounded-2">
+      <form id="chat-form" action="javascript: submitForm();" type="POST" enctype="multipart/form-data">
+        <div class="row">
+          <div class="col d-flex align-items-center">
+            <div class="d-flex justify-content-center align-items-center bg-white" id="drop-area" onclick="clickHandler(event);">
+              <div class="text-center">
+                <img src="/static/images/upload.png" height="24" width="24">
+              </div>
+            </div>
+            <input type="file" id="upload-file" name="upload-file" multiple accept="image/*" class="d-none" onchange="fileChangeHandler(this);">
+          </div>
+          <div class="col d-flex align-items-center d-none" id="img-preview">
+            <img src="/static/images/robot.jpg" width="56" height="56" id="img-src">
+            <a href="#" class="btn btn-primary btn-sm" onclick="javascript:resetFile();"><i class="fa fa-minus fa-lg text-white"></i></a>
+          </div>
+          <div class="col-9 d-flex align-items-center">
+            <textarea class="form-control" id="question" name="question" rows="2" placeholder="Type your question here."></textarea>
+          </div>
+          <div class="col d-flex align-items-center">
+            <button type="submit" class="btn me-2"><i class="fa fa-paper-plane fa-lg text-secondary" id="btn-icon"></i></button>
+            <button type="button" class="btn" onclick="resetInput();"><i class="fa fa-times fa-lg text-success"></i></button>
+          </div>
+        </div>  
+      </form>
+    </div>
+  </div>
+</div>
+<script>
+  function clickHandler(ev){
+    var elem = document.getElementById('upload-file');
+    elem.click();
+  }
+
+  function fileChangeHandler(e){
+    previewImg(e.files[0]);
+  }
+
+  function previewImg(file){
+    var reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = function(){
+      var img = document.getElementById('img-src');
+      img.src = reader.result;
+      img.height = 56;
+      img.width = 56;
+      $('#img-preview').removeClass('d-none');
+      $('#drop-area').addClass('d-none');
+    }
+  }
+
+  function submitForm(){
+    var question = $('#question').val();
+    $('#indicator').removeClass('d-none');
+    $('#clear-content').addClass('d-none');
+    if($.trim(question).length > 0){
+      addUserChat(question);
+      var formData = new FormData($('#chat-form')[0]);
+      resetInput();
+      $.ajax({
+        type: "POST",
+        url: "/conversation",
+        data: formData,
+        contentType: false,
+        cache: false,
+        processData:false,
+        success: function(data){
+          $('#indicator').addClass('d-none');
+          $('#clear-content').removeClass('d-none');
+          append_content(data);
+        }
+      });
+    }else{
+      alert('Please input your question.');
+    }
+  }
+
+  function append_content(html){
+        var container = document.getElementById('chat-container');
+        $(html).appendTo('#chat-container').hide().fadeIn(800, 'linear');
+        if(container.scrollHeight > container.clientHeight){
+            $('#chat-container').animate({scrollTop : container.scrollHeight}, 1000);
+        }
+  }
+
+  function addUserChat(question){
+    var html = '<div class="row m-4">';
+    html += '<div class="col">';
+    html += '<img src="/static/images/user.png" height="24" width="24">';
+    html += '</div>';
+    html += '<div class="px-4 message d-flex flex-row">';      
+    html += question;
+    if(document.getElementById('upload-file').files.length > 0){
+      var src = $('#img-src').attr('src');
+      html += '<img src="' + src +'" height="200">';
+    }
+    html += '</div></div>';
+    append_content(html); 
+  }
+
+  $('#question').on('change keyup paste', function(){
+    var question = $(this).val();
+    if($.trim(question).length > 0){
+      $('#btn-icon').removeClass('text-secondary');
+      $('#btn-icon').addClass('text-primary');
+    }
+  });
+
+  function resetInput(){
+    $('#question').val('');
+    $('#btn-icon').removeClass('text-primary');
+    $('#btn-icon').addClass('text-secondary');
+    resetFile();
+  }
+
+  function resetFile(){
+    document.getElementById('upload-file').value = "";
+    $('#drop-area').removeClass('d-none');
+    $('#img-preview').addClass('d-none');
+  }
+</script>
+{% endblock %}

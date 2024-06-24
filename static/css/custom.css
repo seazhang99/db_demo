@@ -1,0 +1,44 @@
+html {
+  font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  color: #212529;
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5;
+  word-wrap: break-word;
+  color-scheme: light;
+}
+
+.message{
+  width: 95%;
+}
+
+#chat-container{
+  width: 96%;
+  height: 100%;
+  overflow-y: auto;
+  background-color: #f7f8fc;
+}
+
+#img-preview img{
+  width: 100%;
+  height: 100%;
+}
+
+#img-preview .btn{
+  position: absolute;
+  z-index: 2;
+  opacity: 0;
+}
+
+#img-preview .btn:hover {
+  background-color: #212529;
+  opacity: 0.8;
+}
+
+#drop-area{
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  border: 2px dashed #afafaf;
+  border-radius: 8px;
+}

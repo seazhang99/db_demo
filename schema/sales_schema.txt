@@ -1,0 +1,117 @@
+CREATE COLUMN TABLE "DATMOK"."BUSINESS_PARTNERS"(
+	"PARTNERID" NVARCHAR(10) NOT NULL, -- Partner ID
+	"PARTNERROLE" NVARCHAR(1), -- Partner role
+	"EMAILADDRESS" NVARCHAR(40), -- Partner mail address
+	"PHONENUMBER" NVARCHAR(12), -- Partner phone number
+	"FAXNUMBER" NVARCHAR(12), -- Partner fax number
+	"WEBADDRESS" NVARCHAR(40), -- Partner web address
+	"ADDRESSID" NVARCHAR(10), -- Partner address ID
+	"COMPANYNAME" NVARCHAR(25), -- Business Partner name
+	"LEGALFORM" NVARCHAR(8), -- Partner legal form
+	"CREATEDBY" NVARCHAR(10), -- Partner created by
+	"CREATEDAT" NVARCHAR(10), -- Partner created date, YEAR(bp.CREATEDAT) represents the creation year of BP
+	"CHANGEDBY" NVARCHAR(10), -- Partner changed by
+	"CHANGEDAT" NVARCHAR(10), -- Partner changed date, YEAR(bp.CHANGEDAT) represents the creation year of BP
+	"CURRENCY" NVARCHAR(3), -- Partner currency used
+	PRIMARY KEY(
+		"PARTNERID"
+	)
+)
+UNLOAD PRIORITY 5 AUTO MERGE;
+
+CREATE COLUMN TABLE "DATMOK"."SALES_ORDERS"(
+	"SALESORDERID" NVARCHAR(10) NOT NULL, -- Sales order ID
+	"CREATEDBY" NVARCHAR(10), -- Sales order created by
+	"CREATEDAT" NVARCHAR(10), -- Sales order created date, YEAR(so.CREATEDAT) represents the creation year of SO
+	"CHANGEDBY" NVARCHAR(10), -- Sales order changed by
+	"CHANGEDAT" NVARCHAR(10), -- Sales order changed date, YEAR(so.CHANGEDAT) represents the creation year of SO
+	"FISCALYEARVARIANT" NVARCHAR(10), -- Sales order fiscal year variant
+	"FISCALYEARPERIOD" NVARCHAR(10), -- Sales order fiscal year period
+	"NOTEID" NVARCHAR(10), -- Sales order note ID
+	"PARTNERID" NVARCHAR(10), -- Sales order partner ID
+	"SALESORG" NVARCHAR(4), -- Sales organization 
+	"CURRENCY" NVARCHAR(3), -- Sales order currency
+	"GROSSAMOUNT" DECIMAL(32, 2), -- Sales order gross amount
+	"NETAMOUNT" DECIMAL(32, 2), -- Sales order net amount
+	"TAXAMOUNT" DECIMAL(32, 2), -- Sales order tax amount
+	"LIFECYCLESTATUS" NVARCHAR(2), -- Sales order lifecycle status
+	"BILLINGSTATUS" NVARCHAR(2), -- Sales order billing status
+	"DELIVERYSTATUS" NVARCHAR(2) -- Sales order delivery status
+)
+UNLOAD PRIORITY 5 AUTO MERGE;
+
+CREATE COLUMN TABLE "DATMOK"."SALES_ORDER_ITEMS"(
+	"SALESORDERID" NVARCHAR(10), -- Sales order ID
+	"SALESORDERITEM" NVARCHAR(2), -- Sales order item number
+	"PRODUCTID" NVARCHAR(10), -- Sales order item product ID
+	"NOTEID" NVARCHAR(10), -- Sales order item note ID
+	"CURRENCY" NVARCHAR(3), -- Sales order item currency
+	"GROSSAMOUNT" DECIMAL(32, 2), -- Sales order item gross amount
+	"NETAMOUNT" DECIMAL(32, 2), -- Sales order item net amount
+	"TAXAMOUNT" DECIMAL(32, 2), -- Sales order item tax amount
+	"ITEMATPSTATUS" NVARCHAR(1), -- Sales order item ATP status
+	"OPITEMPOS" NVARCHAR(2), -- Sales order item operation position
+	"QUANTITY" INTEGER, -- Sales order item quantity
+	"QUANTITYUNIT" NVARCHAR(2), -- Sales order item quantity unit
+	"DELIVERYDATE" NVARCHAR(8) -- Sales order item delivery date
+)
+UNLOAD PRIORITY 5 AUTO MERGE;
+
+CREATE COLUMN TABLE "DATMOK"."PRODUCTS"(
+	"PRODUCTID" NVARCHAR(10),
+	"TYPECODE" NVARCHAR(2),
+	"PRODUCTCATEGORYID" NVARCHAR(2),
+	"LANGUAGE" NVARCHAR(2),
+	"SUPPLIER_PARTNERID" NVARCHAR(10),
+	"TAXTARIFFCODE" NVARCHAR(1),
+	"QUANTITYUNIT" NVARCHAR(2),
+	"WEIGHTMEASURE" NVARCHAR(5),
+	"WEIGHTUNIT" NVARCHAR(2),
+	"CURRENCY" NVARCHAR(3),
+	"PRICE" DECIMAL(32, 2),
+	"WIDTH" NVARCHAR(5),
+	"DEPTH" NVARCHAR(5),
+	"HEIGHT" NVARCHAR(5),
+	"DIMENSIONUNIT" NVARCHAR(5),
+	"CREATEDBY" NVARCHAR(2),
+	"CREATEDAT" NVARCHAR(8),
+	"CHANGEDBY" NVARCHAR(2),
+	"CHANGEDAT" NVARCHAR(8),
+	"PRODUCTPICURL" NVARCHAR(10)
+)
+UNLOAD PRIORITY 5 AUTO MERGE;
+
+CREATE COLUMN TABLE "DATMOK"."PRODUCT_TEXTS"(
+	"PRODUCTID" NVARCHAR(10),
+	"LANGUAGE" NVARCHAR(2),
+	"SHORT_DESCR" NVARCHAR(20),
+	"MEDIUM_DESCR" NVARCHAR(30),
+	"LONG_DESCR" NVARCHAR(50)
+)
+UNLOAD PRIORITY 5 AUTO MERGE;
+
+CREATE COLUMN TABLE "DATMOK"."PRODUCT_CATEGORY_TEXTS"(
+	"PRODCATEGORYID" NVARCHAR(10),
+	"LANGUAGE" NVARCHAR(2),
+	"SHORT_DESCR" NVARCHAR(20),
+	"MEDIUM_DESCR" NVARCHAR(30),
+	"LONG_DESCR" NVARCHAR(50)
+)
+UNLOAD PRIORITY 5 AUTO MERGE;
+
+One example of the SQL would be `SELECT so.SALESORDERID as "Sales Order", 
+        bp.COMPANYNAME as "Business Partner", 
+        so.CREATEDAT as "Sales Order Creation Date", 
+        YEAR(so.CREATEDAT) as "Year of Sales Order Creation",
+        QUARTER(so.CREATEDAT) as "Quarter of Sales Order Creation",
+        so.CURRENCY as "Currency", 
+        soi.SALESORDERITEM as "Sales Order Item",
+        prod.MEDIUM_DESCR as "Product",
+        TO_DECIMAL(ROUND(soi.GROSSAMOUNT, 2), 32, 2) as "Item Gross Amount",
+        TO_DECIMAL(ROUND(soi.NETAMOUNT, 2), 32, 2) as "Item Net Amount",
+        TO_DECIMAL(ROUND(soi.TAXAMOUNT, 2), 32, 2) as "Item Tax Amount" 
+        FROM DATMOK.SALES_ORDERS as so 
+        JOIN DATMOK.BUSINESS_PARTNERS as bp ON so.PARTNERID = bp.PARTNERID
+        JOIN DATMOK.SALES_ORDER_ITEMS soi ON so.SALESORDERID = soi.SALESORDERID
+        JOIN DATMOK.PRODUCT_TEXTS prod ON soi.PRODUCTID = prod.PRODUCTID;`
+
